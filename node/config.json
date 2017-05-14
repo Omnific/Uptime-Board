@@ -1,3 +1,5 @@
 {
-    "RequestApi": ""
+    "RequestApi": "http://localhost:5000/api/requests",
+    "ResultApi": "",
+    "RequestInterval": 30000
 }

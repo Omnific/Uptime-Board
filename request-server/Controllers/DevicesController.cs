@@ -3,16 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using UptimeBoard.RequestServer.Models;
 
-namespace request_server.Controllers
+namespace UptimeBoard.RequestServer.Controllers
 {
     [Route("api/[controller]")]
-    public class RequestsController : Controller
+    public class DevicesController : Controller
     {
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new string[] { "value1", "value2" });
+            var deviceObjects = new List<DeviceViewModel>
+            {
+                new DeviceViewModel
+                {
+                    Name = "raxxy_1",
+                    Address = "180.181.145.42",
+                    RequestTimeout = 10000,
+                    Type = RequestType.Ping
+                }
+            };
+
+            return Ok(deviceObjects);
         }
 
         [HttpGet("{id}")]

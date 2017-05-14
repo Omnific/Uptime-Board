@@ -1,9 +1,10 @@
-namespace UptimeBoard.RequestServer.Models
+namespace UptimeBoard.Node.Models
 {
-    public class RequestViewModel
+    public class DeviceConfig
     {
+        public string Name { get; set; }
         public string Address { get; set; }
-        public int Threads { get; set; }
+        public int RequestTimeout { get; set; }
         public RequestType Type { get; set; }
     }
 
