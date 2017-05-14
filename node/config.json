@@ -1,5 +1,5 @@
 {
-    "RequestApi": "http://localhost:5000/api/requests",
-    "ResultApi": "",
+    "RequestApi": "http://localhost:5000/api/devices",
+    "ResultApi": "http://10.20.108.222:8086/write?db=Test001",
     "RequestInterval": 30000
 }

@@ -42,6 +42,8 @@ namespace UptimeBoard.Node
 
                 continueRequests = responses.All(r => r);
 
+                Console.WriteLine("Requests Complete");
+
                 Thread.Sleep(config.RequestInterval);
             }
         }
