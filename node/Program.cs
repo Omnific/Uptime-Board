@@ -55,11 +55,21 @@ namespace UptimeBoard.Node
             {
                 try
                 {
+					Console.WriteLine($"Sending To: {responseUrl}");
+					Console.WriteLine($"Pinged: {response.Address}");
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var httpContent = new StringContent("plex_info,host=raxxy transcodes=$numtranscodes");
-                    var request = await client.PostAsync(responseUrl, httpContent);
+                    var contentDictionary = new Dictionary<String, String>()
+                    {
+                        { "ccr1036_stats", "" },
+                        { "host",response.Address },
+                        { "type", "cpu_usage" },
+                        { "cpu_number", "33" },
+                        { "value", "$cpu33" }
+                    };
+                    var formContent = new FormUrlEncodedContent(contentDictionary);
+                    var request = await client.PostAsync(responseUrl, formContent);
                     success = request.EnsureSuccessStatusCode().IsSuccessStatusCode;
                 }
                 catch (HttpRequestException)
@@ -83,6 +93,7 @@ namespace UptimeBoard.Node
                     return new DeviceResponse
                     {
                         Name = config.Name,
+						Address = config.Address,
                         Success = reply.Status == IPStatus.Success,
                         TotalMs = reply.RoundtripTime
                     };
