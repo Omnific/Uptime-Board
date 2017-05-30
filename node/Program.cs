@@ -23,16 +23,17 @@ namespace UptimeBoard.Node
         {
             var configJson = File.ReadAllText("config.json");
             var config = JsonConvert.DeserializeObject<Config>(configJson);
-            var deviceConfig = await DownloadDeviceConfig(config.RequestApi);
-
-            if (deviceConfig == null)
-            {
-                Console.WriteLine($"Failed to load device configurations from {config.RequestApi}");
-            }
 
             bool continueRequests = true;
             while (continueRequests)
             {
+                var deviceConfig = await DownloadDeviceConfig(config.RequestApi);
+
+                if (deviceConfig == null)
+                {
+                    Console.WriteLine($"Failed to load device configurations from {config.RequestApi}");
+                }
+
                 var responses = deviceConfig.AsParallel()
                                     .Select(async d => (await RequestDevice(d)))
                                     .Select(d => d.Result)
