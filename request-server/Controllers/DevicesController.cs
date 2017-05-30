@@ -12,19 +12,14 @@ namespace UptimeBoard.RequestServer.Controllers
     [Route("api/[controller]")]
     public class DevicesController : Controller
     {
-        private string _content = null;
-
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            if (_content == null)
-            {
-                var info = new System.IO.FileInfo("servers.json");
-                var reader = info.OpenText();
-                _content = await reader.ReadToEndAsync();
-            }
+            var info = new System.IO.FileInfo("servers.json");
+            var reader = info.OpenText();
+            var content = await reader.ReadToEndAsync();
             
-            return Ok(JsonConvert.DeserializeObject<List<DeviceViewModel>>(_content));
+            return Ok(JsonConvert.DeserializeObject<List<DeviceViewModel>>(content));
         }
 
         [HttpGet("{id}")]
