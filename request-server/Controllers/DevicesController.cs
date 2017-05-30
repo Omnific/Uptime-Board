@@ -15,9 +15,13 @@ namespace UptimeBoard.RequestServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            string content;
             var info = new System.IO.FileInfo("servers.json");
-            var reader = info.OpenText();
-            var content = await reader.ReadToEndAsync();
+
+            using(var reader = info.OpenText())
+            {
+                content = await reader.ReadToEndAsync();
+            }
             
             return Ok(JsonConvert.DeserializeObject<List<DeviceViewModel>>(content));
         }

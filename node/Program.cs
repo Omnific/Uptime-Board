@@ -33,21 +33,23 @@ namespace UptimeBoard.Node
                 {
                     Console.WriteLine($"Failed to load device configurations from {config.RequestApi}");
                 }
-
-                var responses = deviceConfig.AsParallel()
-                                    .Select(async d => (await RequestDevice(d)))
-                                    .Select(d => d.Result)
-                                    .Select(async r => (await SendResult(config.ResultApi, r)))
-                                    .Select(r => r.Result)
-                                    .AsEnumerable();
-
-                continueRequests = responses.All(r => r);
-
-                Console.WriteLine("Requests Complete");
-
-                if (continueRequests)
+                else
                 {
-                    Thread.Sleep(config.RequestInterval);
+                    var responses = deviceConfig.AsParallel()
+                                        .Select(async d => (await RequestDevice(d)))
+                                        .Select(d => d.Result)
+                                        .Select(async r => (await SendResult(config.ResultApi, r)))
+                                        .Select(r => r.Result)
+                                        .AsEnumerable();
+
+                    continueRequests = responses.All(r => r);
+
+                    Console.WriteLine("Requests Complete");
+
+                    if (continueRequests)
+                    {
+                        Thread.Sleep(config.RequestInterval);
+                    }
                 }
             }
         }
@@ -130,9 +132,8 @@ namespace UptimeBoard.Node
                     var stringResult = await response.Content.ReadAsStringAsync();
                     result = JsonConvert.DeserializeObject<List<DeviceConfig>>(stringResult);
                 }
-                catch (HttpRequestException ex)
+                catch (HttpRequestException)
                 {
-                    Console.WriteLine(ex.ToString());
                 }
             }
 
