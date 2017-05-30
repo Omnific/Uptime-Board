@@ -18,9 +18,10 @@ namespace UptimeBoard.RequestServer.Controllers
                 new DeviceViewModel
                 {
                     Name = "raxxy_1",
-                    Address = "180.181.145.42",
+                    Address = "8.8.8.8",
                     RequestTimeout = 10000,
-                    Type = RequestType.Ping
+                    Type = RequestType.Ping,
+                    Total = 4
                 }
             };
 

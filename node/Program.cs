@@ -44,7 +44,10 @@ namespace UptimeBoard.Node
 
                 Console.WriteLine("Requests Complete");
 
-                Thread.Sleep(config.RequestInterval);
+                if (continueRequests)
+                {
+                    Thread.Sleep(config.RequestInterval);
+                }
             }
         }
 
@@ -56,24 +59,20 @@ namespace UptimeBoard.Node
                 try
                 {
 					Console.WriteLine($"Sending To: {responseUrl}");
-					Console.WriteLine($"Pinged: {response.Address}");
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var contentDictionary = new Dictionary<String, String>()
-                    {
-                        { "ccr1036_stats", "" },
-                        { "host",response.Address },
-                        { "type", "cpu_usage" },
-                        { "cpu_number", "33" },
-                        { "value", "$cpu33" }
-                    };
-                    var formContent = new FormUrlEncodedContent(contentDictionary);
-                    var request = await client.PostAsync(responseUrl, formContent);
-                    success = request.EnsureSuccessStatusCode().IsSuccessStatusCode;
+                    var request = $"plex_info,host={response.Name},address={response.Address} pings={response.Total},ms={response.TotalMs},up={(response.Up ? "1" : "0")}";
+                    
+					Console.WriteLine($"Sending: {request}");
+
+                    var content = new StringContent(request);
+                    var requestResponse = await client.PostAsync(responseUrl, content);
+                    success = requestResponse.EnsureSuccessStatusCode().IsSuccessStatusCode;
                 }
-                catch (HttpRequestException)
+                catch (HttpRequestException ex)
                 {
+                    Console.WriteLine(ex.ToString());
                     success = false;
                 }
             }
@@ -85,19 +84,29 @@ namespace UptimeBoard.Node
         {
             if (config.Type == RequestType.Ping)
             {
+                List<PingReply> pingReplies = new List<PingReply>();
+
                 using (Ping pinger = new Ping())
                 {
                     var pingOptions = new PingOptions();
                     byte[] buffer = new byte[32];
-                    PingReply reply = await pinger.SendPingAsync(config.Address, 1000, buffer);
-                    return new DeviceResponse
+
+                    for(var i=0; i<config.Total; i++)
                     {
-                        Name = config.Name,
-						Address = config.Address,
-                        Success = reply.Status == IPStatus.Success,
-                        TotalMs = reply.RoundtripTime
-                    };
+                        pingReplies.Add(await pinger.SendPingAsync(config.Address, config.RequestTimeout, buffer));
+					    Console.WriteLine($"Pinged: {config.Address}");
+                    }
                 }
+
+                return new DeviceResponse
+                {
+                    Name = config.Name,
+                    Address = config.Address,
+                    Total = config.Total,
+                    Success = pingReplies.All(r => r.Status == IPStatus.Success),
+                    TotalMs = Convert.ToInt64(pingReplies.Average(r => r.RoundtripTime)),
+                    Up = !pingReplies.All(r => r.Status != IPStatus.Success)
+                };
             }
 
             return null;

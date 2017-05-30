@@ -6,6 +6,7 @@ namespace UptimeBoard.RequestServer.Models
         public string Address { get; set; }
         public int RequestTimeout { get; set; }
         public RequestType Type { get; set; }
+        public int Total { get; set; } = 1;
     }
 
     public enum RequestType : int
