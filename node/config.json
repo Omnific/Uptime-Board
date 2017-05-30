@@ -1,4 +1,5 @@
 {
+    "NodeName": "Node-1",
     "RequestApi": "http://localhost:5000/api/devices",
     "ResultApi": "http://103.73.86.2:8086/write?db=pings",
     "RequestInterval": 30000

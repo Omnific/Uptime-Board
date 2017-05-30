@@ -38,7 +38,7 @@ namespace UptimeBoard.Node
                     var responses = deviceConfig.AsParallel()
                                         .Select(async d => (await RequestDevice(d)))
                                         .Select(d => d.Result)
-                                        .Select(async r => (await SendResult(config.ResultApi, r)))
+                                        .Select(async r => (await SendResult(config.NodeName, config.ResultApi, r)))
                                         .Select(r => r.Result)
                                         .AsEnumerable();
 
@@ -54,7 +54,7 @@ namespace UptimeBoard.Node
             }
         }
 
-        public async static Task<bool> SendResult(string responseUrl, DeviceResponse response)
+        public async static Task<bool> SendResult(string nodeName, string responseUrl, DeviceResponse response)
         {
             var success = false;
             using (var client = new HttpClient())
@@ -65,7 +65,7 @@ namespace UptimeBoard.Node
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var request = $"plex_info,host={response.Name},address={response.Address} pings={response.Total},ms={response.TotalMs},up={(response.Up ? "1" : "0")}";
+                    var request = $"plex_info,source={nodeName},target={response.Address},hostname={response.Name} pings={response.Total},up={(response.Up ? "1" : "0")},ms={response.TotalMs}";
                     
 					Console.WriteLine($"Sending: {request}");
 
