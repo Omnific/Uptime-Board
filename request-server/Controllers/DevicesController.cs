@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using UptimeBoard.RequestServer.Models;
 
 namespace UptimeBoard.RequestServer.Controllers
@@ -10,22 +12,19 @@ namespace UptimeBoard.RequestServer.Controllers
     [Route("api/[controller]")]
     public class DevicesController : Controller
     {
-        [HttpGet]
-        public IActionResult Get()
-        {
-            var deviceObjects = new List<DeviceViewModel>
-            {
-                new DeviceViewModel
-                {
-                    Name = "raxxy_1",
-                    Address = "8.8.8.8",
-                    RequestTimeout = 10000,
-                    Type = RequestType.Ping,
-                    Total = 4
-                }
-            };
+        private string _content = null;
 
-            return Ok(deviceObjects);
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            if (_content == null)
+            {
+                var info = new System.IO.FileInfo("servers.json");
+                var reader = info.OpenText();
+                _content = await reader.ReadToEndAsync();
+            }
+            
+            return Ok(JsonConvert.DeserializeObject<List<DeviceViewModel>>(_content));
         }
 
         [HttpGet("{id}")]

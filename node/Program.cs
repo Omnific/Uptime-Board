@@ -129,8 +129,9 @@ namespace UptimeBoard.Node
                     var stringResult = await response.Content.ReadAsStringAsync();
                     result = JsonConvert.DeserializeObject<List<DeviceConfig>>(stringResult);
                 }
-                catch (HttpRequestException)
+                catch (HttpRequestException ex)
                 {
+                    Console.WriteLine(ex.ToString());
                 }
             }
 

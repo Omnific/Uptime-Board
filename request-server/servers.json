@@ -1,0 +1,9 @@
+[
+    {
+        "Name": "raxxy_1",
+        "Address": "8.8.8.8",
+        "RequestTimeout": 10000,
+        "Type": 0,
+        "Total": 4
+    }
+]
