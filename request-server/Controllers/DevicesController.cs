@@ -23,7 +23,7 @@ namespace UptimeBoard.RequestServer.Controllers
                 content = await reader.ReadToEndAsync();
             }
             
-            return Ok(JsonConvert.DeserializeObject<List<DeviceViewModel>>(content));
+            return Ok(JsonConvert.DeserializeObject<DeviceRequest>(content));
         }
 
         [HttpGet("{id}")]
