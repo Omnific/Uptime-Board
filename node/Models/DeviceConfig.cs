@@ -7,6 +7,7 @@ namespace UptimeBoard.Node.Models
         public int RequestTimeout { get; set; }
         public RequestType Type { get; set; }
         public int Total { get; set; } = 1;
+        public int PacketByteSize { get; set; } = 32;
     }
 
     public enum RequestType : int

@@ -35,10 +35,10 @@ namespace UptimeBoard.Node
                 }
                 else
                 {
-                    var responses = deviceConfig.AsParallel()
+                    var responses = deviceConfig.Devices.AsParallel()
                                         .Select(async d => (await RequestDevice(d)))
                                         .Select(d => d.Result)
-                                        .Select(async r => (await SendResult(config.NodeName, config.ResultApi, r)))
+                                        .Select(async r => (await SendResult(config.NodeName, deviceConfig.ResultApi, r)))
                                         .Select(r => r.Result)
                                         .AsEnumerable();
 
@@ -48,7 +48,7 @@ namespace UptimeBoard.Node
 
                     if (continueRequests)
                     {
-                        Thread.Sleep(config.RequestInterval);
+                        Thread.Sleep(deviceConfig.RequestInterval);
                     }
                 }
             }
@@ -65,7 +65,7 @@ namespace UptimeBoard.Node
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    var request = $"plex_info,source={nodeName},target={response.Address},hostname={response.Name} pings={response.Total},up={(response.Up ? "1" : "0")},ms={response.TotalMs}";
+                    var request = $"plex_info,source={nodeName},target={response.Address},hostname={response.Name} pings={response.Total},{(response.Up ? "up=1" : "down=1")},ms={response.TotalMs}";
                     
 					Console.WriteLine($"Sending: {request}");
 
@@ -92,7 +92,7 @@ namespace UptimeBoard.Node
                 using (Ping pinger = new Ping())
                 {
                     var pingOptions = new PingOptions();
-                    byte[] buffer = new byte[32];
+                    byte[] buffer = new byte[config.PacketByteSize];
 
                     for(var i=0; i<config.Total; i++)
                     {
@@ -115,9 +115,9 @@ namespace UptimeBoard.Node
             return null;
         }
 
-        public async static Task<List<DeviceConfig>> DownloadDeviceConfig(string apiUrl)
+        public async static Task<DeviceRequest> DownloadDeviceConfig(string apiUrl)
         {
-            List<DeviceConfig> result = null;
+            DeviceRequest result = null;
 
             using (var client = new HttpClient())
             {
@@ -130,7 +130,7 @@ namespace UptimeBoard.Node
                     response.EnsureSuccessStatusCode();
     
                     var stringResult = await response.Content.ReadAsStringAsync();
-                    result = JsonConvert.DeserializeObject<List<DeviceConfig>>(stringResult);
+                    result = JsonConvert.DeserializeObject<DeviceRequest>(stringResult);
                 }
                 catch (HttpRequestException)
                 {

@@ -1,9 +1,13 @@
-[
-    {
-        "Name": "raxxy_1",
-        "Address": "8.8.8.8",
-        "RequestTimeout": 10000,
-        "Type": 0,
-        "Total": 4
-    }
-]
+{
+    "ResultApi": "http://103.73.86.2:8086/write?db=pings",
+    "RequestInterval": 30000,
+    "Devices": [
+        {
+            "Name": "raxxy_1",
+            "Address": "8.8.8.8",
+            "RequestTimeout": 10000,
+            "Type": 0,
+            "Total": 4
+        }
+    ]
+}
